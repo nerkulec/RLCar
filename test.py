@@ -1,11 +1,14 @@
 from car_env import CarEnv
 import numpy as np
+from util import Vec
 
-env = CarEnv()
+env = CarEnv(file_name = 'maps/maptest.txt')
 
-state = env.reset()
-done = False
-while not done:
+while True:
+    done = False
+    state = env.reset()
+    while not done:
+        env.render()
+        action = env.action_space.sample()
+        state, reward, done, _ = env.step(action)
     env.render()
-    action = np.array([1, 0])
-    obs, reward, done, _ = env.step(action)

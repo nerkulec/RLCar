@@ -15,6 +15,11 @@ class Map:
         self.width = len(board[0])
         self.height = len(board)
         self.board = board
+        for y in range(self.height):
+            for x in range(self.width):
+                v = Vec(x, y)
+                if self[v] == 'M':
+                    self.M = v + Vec(0.5, 0.5)
 
     def __getitem__(self, pos):
         try:
@@ -30,7 +35,9 @@ class Map:
                0 <= pos.y < self.height and\
                self[pos] != '#'
                
-    def get_closest(self, pos, field = '#', jump = 0.2, num_steps = 11, rays = 12):
+    def get_closest(self, pos, field = '#', jump = 0.2, num_steps = 11, rays = 12, batch = None):
+        if batch is not None:
+            self.rays = []
         closest = np.zeros(rays)
         for i in range(rays):
             c = math.cos(i*2*math.pi/rays)
@@ -40,6 +47,11 @@ class Map:
                 closest[i] = j
                 if self[ray] == field:
                     break
+            if batch is not None:
+                coef = math.floor(255*(num_steps-j)/(num_steps-1))
+                self.rays.append(shapes.Line(
+                    pos.x*tile_width, pos.y*tile_width, ray.x*tile_width, ray.y*tile_width, 1,
+                    color=(coef, (255-coef)//2, 0), batch=batch))
         return (num_steps-closest)/(num_steps-1)
 
     def print(self):
